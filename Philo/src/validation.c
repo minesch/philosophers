@@ -6,7 +6,7 @@
 /*   By: azakarya <azakarya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/20 21:51:23 by azakarya          #+#    #+#             */
-/*   Updated: 2022/12/28 23:39:04 by azakarya         ###   ########.fr       */
+/*   Updated: 2023/01/13 23:37:20 by azakarya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,15 +40,15 @@ t_philos	*get_args(char **av)
 	t_philos	*philos;
 	t_main		*rules;
 	int			i;
-
 	i = -1;
 	rules = malloc(sizeof(t_main));
 	philos = malloc(sizeof(t_philos) * ft_atoi(av[1]));
+	rules->start_time = cur_time();
 	rules->ph_count = ft_atoi(av[1]);
 	rules->die = ft_atoi(av[2]);
 	rules->eat = ft_atoi(av[3]);
 	rules->sleep = ft_atoi(av[4]);
-	rules->print = malloc(sizeof(pthread_mutex_t *));
+	rules->print_mutex = malloc(sizeof(pthread_mutex_t *));
 	if (av[5])
 		rules->max_eat = ft_atoi(av[5]);
 	else
@@ -64,11 +64,19 @@ t_philos	*get_args(char **av)
 int	check_argv(int ac, char **av)
 {
 	int	i;
+	int	j;
 
 	i = 0;
 	while (++i < ac)
-		if (av[i] < 48 && av[i] > 56)
-			return (1);
+	{
+		j = 0;
+		while (av[i][j])
+		{
+			if (av[i][j] < 48 && av[i][j] > 56)
+				return (1);
+			j++;
+		}
+	}
 	i = 0;
 	while (++i < ac)
 	{
