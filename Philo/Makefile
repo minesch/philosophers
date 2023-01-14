@@ -2,7 +2,7 @@ NAME = philo
 CC = cc
 OBJS_DIR = objs
 SRCS_DIR = src
-FLAGS =  -Wall -Werror -Wextra -g -Iincludes -fsanitize=address
+FLAGS =  -Wall -Werror -Wextra -g -Iincludes #-fsanitize=address
 SRCS = $(wildcard $(SRCS_DIR)/*.c)
 OBJS = $(patsubst $(SRCS_DIR)/%.c, $(OBJS_DIR)/%.o, $(SRCS))
 RM = rm -rf

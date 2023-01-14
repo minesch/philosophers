@@ -6,7 +6,7 @@
 /*   By: azakarya <azakarya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/20 21:51:23 by azakarya          #+#    #+#             */
-/*   Updated: 2023/01/13 23:37:20 by azakarya         ###   ########.fr       */
+/*   Updated: 2023/01/14 23:45:35 by azakarya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,15 +40,15 @@ t_philos	*get_args(char **av)
 	t_philos	*philos;
 	t_main		*rules;
 	int			i;
+
 	i = -1;
 	rules = malloc(sizeof(t_main));
 	philos = malloc(sizeof(t_philos) * ft_atoi(av[1]));
-	rules->start_time = cur_time();
 	rules->ph_count = ft_atoi(av[1]);
 	rules->die = ft_atoi(av[2]);
 	rules->eat = ft_atoi(av[3]);
 	rules->sleep = ft_atoi(av[4]);
-	rules->print_mutex = malloc(sizeof(pthread_mutex_t *));
+	rules->print_mutex = malloc(sizeof(pthread_mutex_t));
 	if (av[5])
 		rules->max_eat = ft_atoi(av[5]);
 	else
@@ -57,6 +57,7 @@ t_philos	*get_args(char **av)
 	{
 		philos[i].rules = rules;
 		philos[i].index = i;
+		philos[i].last_eat_time = -1;
 	}
 	return (philos);
 }

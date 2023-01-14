@@ -6,16 +6,16 @@
 /*   By: azakarya <azakarya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/22 00:47:06 by azakarya          #+#    #+#             */
-/*   Updated: 2022/12/27 18:45:28 by azakarya         ###   ########.fr       */
+/*   Updated: 2023/01/14 22:54:45 by azakarya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include	"philo.h"
 
-void	_timer(size_t tt)
+void	_timer(long long int tt)
 {
-	size_t	time;
-	size_t	n_time;
+	long long int	time;
+	long long int	n_time;
 
 	time = cur_time();
 	n_time = cur_time();
@@ -26,12 +26,10 @@ void	_timer(size_t tt)
 	}
 }
 
-size_t	cur_time(void)
+long long int	cur_time(void)
 {
 	struct timeval	t;
-	size_t			time;
 
 	gettimeofday(&t, NULL);
-	time = (t.tv_sec * 1000) + (t.tv_usec / 1000);
-	return (time);
+	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
 }
