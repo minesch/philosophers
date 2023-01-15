@@ -5,23 +5,34 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: azakarya <azakarya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/12/12 22:47:10 by azakarya          #+#    #+#             */
-/*   Updated: 2023/01/13 23:36:40 by azakarya         ###   ########.fr       */
+/*   Created: 2023/01/16 01:16:00 by azakarya          #+#    #+#             */
+/*   Updated: 2023/01/16 01:48:41 by azakarya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include	"philo.h"
+#include"philo.h"
 
-int	main(int ac, char **av)
+int	ft_free(void *ptr)
 {
-	t_philos	*philos;
+	free(ptr);
+	return (1);
+}
 
-	if ((ac == 5 || ac == 6) && check_argv(ac, av) == 0)
+int	main(int argc, char **argv)
+{
+	t_main	*rules;
+
+	rules = malloc(sizeof(t_main));
+	if (rules || argc < 5 || argc > 6 || (ft_valid_args(argc, argv) == 0))
 	{
-		philos = get_args(av);
-		init_philos(philos);
+		get_args(argc, argv, rules);
+		init_mutexes(rules);
+		rules->philo = malloc(sizeof(t_philo) * rules->philo_nbr);
+		init_philo(rules);
+		create_philo(rules);
+		return (0);
 	}
-	else
-		return (write(1, "Error\n", 6), 1);
-	return (0);
+	free(rules);
+	printf("Error\n");
+	return (-1);
 }

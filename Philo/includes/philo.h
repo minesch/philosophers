@@ -5,64 +5,68 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: azakarya <azakarya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/12/12 22:47:04 by azakarya          #+#    #+#             */
-/*   Updated: 2023/01/14 23:56:15 by azakarya         ###   ########.fr       */
+/*   Created: 2023/01/16 01:15:53 by azakarya          #+#    #+#             */
+/*   Updated: 2023/01/16 01:34:24 by azakarya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
 
-# include <pthread.h>
-# include <unistd.h>
-# include <stdlib.h>
-# include <limits.h>
-# include <sys/time.h>
-# include <stdio.h>
+# include<unistd.h>
+# include<stdlib.h>
+# include<stdio.h>
+# include<pthread.h>
+# include<sys/time.h>
+
+typedef struct s_philo
+{
+	int				philo_index;
+	int				eat_count;
+	long long		current_time;
+	long long		start_time;
+	int				death_time;
+	int				eat_time;
+	int				sleep_time;
+	int				must_eat_nbr;
+	pthread_t		philo_thread;
+	pthread_mutex_t	*mutex_l_fork;
+	pthread_mutex_t	monitoring_mutex;
+	pthread_mutex_t	*print_mutex;
+	pthread_mutex_t	*mutex_r_fork;
+}	t_philo;
 
 typedef struct s_main
 {
-	long long int	eat;
-	long long int	sleep;
-	long long int	die;
-	long long int	ph_count;
-	long long int	max_eat;
-	long long int	start_time;
+	int				philo_nbr;
+	int				death_time;
+	int				eat_time;
+	int				sleep_time;
+	int				must_eat_nbr;
 	pthread_mutex_t	*fork_mutex;
 	pthread_mutex_t	*print_mutex;
+	t_philo			*philo;
 }	t_main;
 
-typedef struct s_philos
-{
-	pthread_t		thread;
-	int				index;
-	long long int	eat_count;
-	long long int	last_eat_time;
-	pthread_mutex_t	*left_fork;
-	pthread_mutex_t	*right_fork;
-	t_main			*rules;
-}	t_philos;
-
-// void			printforks(t_philos *philo);
 //validation.c
-int				ft_atoi(const char *str);
-t_philos		*get_args(char **av);
-int				check_argv(int ac, char **av);
+long long int	ft_atoi(const char *str);
+void			_timer(unsigned long time);
+int				ft_is_digit_s(char *str);
+int				ft_valid_args(int argc, char **argv);
+long long		cur_time(void);
 
-//init.c
-void			*routine(void *value);
-void			init_philos(t_philos *philos);
-void			create_philos(t_philos *philos);
-
-//time.c
-void			_timer(long long int tt);
-long long int	cur_time(void);
+//check.c
+void			ft_print_message(t_philo *philo, char *str);
+int				death_check(t_philo *philo);
+int				thread_cycle_limit(t_main *rules);
+void			ft_monitoring(t_main *rules);
 
 //life.c
-void			eat(t_philos *philo);
-void			sleeping(t_philos *philo);
-void			thinking(t_philos *philo);
-void			check_death(t_philos *philos);
-void			print_action(char *str, t_philos *philos);
+int				create_philo(t_main *rules);
+void			*routine(void *arg);
 
+//init.c
+int				init_philo(t_main *rules);
+int				init_mutexes(t_main *rules);
+int				get_args( int argc, char **argv, t_main *rules);
 #endif

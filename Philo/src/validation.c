@@ -5,84 +5,80 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: azakarya <azakarya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/12/20 21:51:23 by azakarya          #+#    #+#             */
-/*   Updated: 2023/01/14 23:45:35 by azakarya         ###   ########.fr       */
+/*   Created: 2023/01/16 01:16:21 by azakarya          #+#    #+#             */
+/*   Updated: 2023/01/16 01:38:29 by azakarya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include	"philo.h"
+#include"philo.h"
 
-int	ft_atoi(const char *str)
+long long int	ft_atoi(const char *str)
 {
-	int	res;
-	int	mop;
+	int				sign;
+	int				i;
+	long long int	num;
 
-	mop = 1;
-	res = 0;
-	while ((*str == 32) || (*str >= 9 && *str <= 13))
-		str++;
-	if ((str[0] == '-') || (str[0] == '+'))
+	i = 0;
+	sign = 1;
+	num = 0;
+	while (str[i] == ' ' || str[i] == '\n' || str[i] == '\t' || str[i] == '\v'
+		|| str[i] == '\f' || str[i] == '\r')
+		i++;
+	if (str[i] == '-' || str[i] == '+')
 	{
-		if (*str == '-')
-			mop *= -1;
-		str++;
+		if (str[i] == '-')
+			sign *= -1;
+		i++;
 	}
-	while (*str >= '0' && *str <= '9')
+	while (str[i] >= 48 && str[i] <= 57)
 	{
-		res = (res * 10) + ((int)*str - '0');
-		str++;
+		num = num * 10 + (str[i] - 48);
+		i++;
 	}
-	return (res * mop);
+	return (num * sign);
 }
 
-t_philos	*get_args(char **av)
+void	_timer(unsigned long time)
 {
-	t_philos	*philos;
-	t_main		*rules;
-	int			i;
+	unsigned long	start_time;
 
-	i = -1;
-	rules = malloc(sizeof(t_main));
-	philos = malloc(sizeof(t_philos) * ft_atoi(av[1]));
-	rules->ph_count = ft_atoi(av[1]);
-	rules->die = ft_atoi(av[2]);
-	rules->eat = ft_atoi(av[3]);
-	rules->sleep = ft_atoi(av[4]);
-	rules->print_mutex = malloc(sizeof(pthread_mutex_t));
-	if (av[5])
-		rules->max_eat = ft_atoi(av[5]);
-	else
-		rules->max_eat = -1;
-	while (++i < ft_atoi(av[1]))
-	{
-		philos[i].rules = rules;
-		philos[i].index = i;
-		philos[i].last_eat_time = -1;
-	}
-	return (philos);
+	start_time = cur_time();
+	while (cur_time() - start_time < time)
+		usleep(100);
 }
 
-int	check_argv(int ac, char **av)
+int	ft_is_digit_s(char *str)
 {
 	int	i;
-	int	j;
 
 	i = 0;
-	while (++i < ac)
+	while (str[i] != '\0')
 	{
-		j = 0;
-		while (av[i][j])
-		{
-			if (av[i][j] < 48 && av[i][j] > 56)
-				return (1);
-			j++;
-		}
-	}
-	i = 0;
-	while (++i < ac)
-	{
-		if (ft_atoi(av[i]) <= 0 && (ft_atoi(av[i]) >= INT_MAX))
+		if (!(str[i] >= 48 && str[i] <= 57))
 			return (1);
+		i++;
 	}
 	return (0);
+}
+
+int	ft_valid_args(int argc, char **argv)
+{
+	int	i;
+
+	i = 1;
+	while (i < argc)
+	{
+		if (ft_is_digit_s(argv[i]) == 1)
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+long long	cur_time(void)
+{
+	struct timeval	time;
+
+	gettimeofday (&time, NULL);
+	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
