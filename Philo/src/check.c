@@ -5,70 +5,90 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: azakarya <azakarya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/16 01:16:33 by azakarya          #+#    #+#             */
-/*   Updated: 2023/01/16 01:41:59 by azakarya         ###   ########.fr       */
+/*   Created: 2023/01/17 22:21:53 by azakarya          #+#    #+#             */
+/*   Updated: 2023/01/17 22:39:00 by azakarya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	ft_print_message(t_philo *philo, char *str)
+char	check_inputs(int argc, char *argv[])
 {
-	pthread_mutex_lock(philo->print_mutex);
-	printf("[%llu] [%d] [%s]\n", cur_time() - philo->start_time,
-		philo->philo_index, str);
-	pthread_mutex_unlock(philo->print_mutex);
-}
+	int	c;
 
-int	death_check(t_philo *philo)
-{
-	pthread_mutex_lock(&philo->monitoring_mutex);
-	if (cur_time() - philo->current_time > philo->death_time)
-		return (1);
-	pthread_mutex_unlock(&philo->monitoring_mutex);
-	return (0);
-}
-
-int	thread_cycle_limit(t_main *rules)
-{
-	int	i;
-	int	j;
-
-	i = 0;
-	j = 0;
-	while (death_check(&rules->philo[i]) == 0 && i < rules->philo_nbr)
+	while (--argc)
 	{
-		if (rules->philo[i].eat_count >= rules->must_eat_nbr)
-			j++;
-		if (j == rules->philo_nbr)
-			return (1);
-		i++;
+		c = 0;
+		while (argv[argc][c])
+		{
+			if (argv[argc][c] < '0' || argv[argc][c] > '9')
+				return (0);
+			c++;
+		}
 	}
-	return (0);
+	return (1);
 }
 
-void	ft_monitoring(t_main *rules)
+t_main	*get_args(int argc, char *argv[])
 {
-	int	i;
+	t_main	*rules;
 
-	i = 0;
-	while (1)
+	rules = malloc(sizeof(t_main));
+	if (!rules)
+		return (NULL);
+	memset(rules, 0, sizeof(t_main));
+	rules->musteat = -1;
+	if (argc == 6)
+		rules->musteat = ft_atol(argv[--argc]);
+	rules->sleep = ft_atol(argv[--argc]);
+	rules->eat = ft_atol(argv[--argc]);
+	rules->die = ft_atol(argv[--argc]);
+	rules->philo_num = ft_atol(argv[--argc]);
+	rules->loaded = 0;
+	if (rules->philo_num == 0 && ft_free(rules))
+		return (NULL);
+	rules->mutex = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+	if (!rules->mutex && ft_free(rules))
+		return (NULL);
+	return (rules);
+}
+
+static void	*ft_calloc(unsigned long size)
+{
+	void	*ret;
+
+	ret = malloc(size);
+	if (!ret)
+		return (NULL);
+	memset(ret, 0, size);
+	return (ret);
+}
+
+t_philos	*create_philos(t_philos *ret, unsigned long count, t_main *rules)
+{
+	ret = ft_calloc(sizeof(t_philos) * rules->philo_num);
+	while (ret != NULL && ++count && count <= rules->philo_num)
 	{
-		if (i == rules->philo_nbr)
-		i = 0;
-		if (death_check(&rules->philo[i]) == 1)
+		ret[count - 1].num = count;
+		ret[count - 1].rules = rules;
+		if (count == rules->philo_num && rules->philo_num > 1)
+			ret[count - 1].right_fork = ret[0].left_fork;
+		else
 		{
-			pthread_mutex_lock(rules->print_mutex);
-			pthread_mutex_unlock(&rules->philo[i].monitoring_mutex);
-			printf("[%llu] [%d] [%s]\n", cur_time() - \
-			rules->philo->current_time, rules->philo[i].philo_index, "died");
-			break ;
+			ret[count - 1].right_fork = malloc(sizeof(pthread_mutex_t));
+			if (!ret[count - 1].right_fork && free_data(ret))
+				return (0);
+			pthread_mutex_init(ret[count - 1].right_fork, NULL);
 		}
-		else if (rules->must_eat_nbr != 0)
+		if (count == 1)
 		{
-			if (thread_cycle_limit(rules) == 1)
-				break ;
+			ret[count - 1].left_fork = malloc(sizeof(pthread_mutex_t));
+			if (!ret[count - 1].left_fork && free_data(ret))
+				return (0);
+			pthread_mutex_init(ret[count - 1].left_fork, NULL);
 		}
-		i++;
+		else
+			ret[count - 1].left_fork = ret[count - 2].right_fork;
 	}
+	return (ret);
 }

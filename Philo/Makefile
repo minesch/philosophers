@@ -1,34 +1,3 @@
-# NAME = philo
-
-# CC = cc
-
-# CFLAGS =  -Wall -Wextra -Werror
-
-
-# SRC = $(wildcard *.c)
-
-# OBJS = $(patsubst %.c, %.o, $(SRC))
-
-# RM = rm -f
-
-# %.o: %.c
-# 	$(CC) $(CFLAGS) -c $< -o $@
-
-# all:  $(NAME)
-
-# $(NAME):  $(OBJS)
-# 	$(CC) $(CFLAGS)  $(OBJS) -o $(NAME)
-
-# clean:
-# 	$(RM) $(OBJS)
-
-# fclean: clean
-# 	$(RM)  $(NAME)
-
-# re: fclean all
-
-# .PHONY: all clean fclean re
-
 NAME = philo
 CC = cc
 OBJS_DIR = objs

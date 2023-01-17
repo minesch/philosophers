@@ -5,68 +5,79 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: azakarya <azakarya@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/01/16 01:15:53 by azakarya          #+#    #+#             */
-/*   Updated: 2023/01/16 01:34:24 by azakarya         ###   ########.fr       */
+/*   Created: 2023/01/17 21:58:11 by azakarya          #+#    #+#             */
+/*   Updated: 2023/01/17 23:06:03 by azakarya         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
 
-# include<unistd.h>
-# include<stdlib.h>
-# include<stdio.h>
-# include<pthread.h>
-# include<sys/time.h>
+# include <unistd.h>
+# include <pthread.h>
+# include <sys/time.h>
+# include <time.h>
+# include <stdlib.h>
+# include <string.h>
+# include <stdio.h>
 
-typedef struct s_philo
+typedef enum e_philostates
 {
-	int				philo_index;
-	int				eat_count;
-	long long		current_time;
-	long long		start_time;
-	int				death_time;
-	int				eat_time;
-	int				sleep_time;
-	int				must_eat_nbr;
-	pthread_t		philo_thread;
-	pthread_mutex_t	*mutex_l_fork;
-	pthread_mutex_t	monitoring_mutex;
-	pthread_mutex_t	*print_mutex;
-	pthread_mutex_t	*mutex_r_fork;
-}	t_philo;
+	PS_NONE,
+	PS_DEAD,
+	PS_SLEEPING,
+	PS_EATING,
+	PS_THINKING,
+	PS_FORK
+}				t_philostates;
 
 typedef struct s_main
 {
-	int				philo_nbr;
-	int				death_time;
-	int				eat_time;
-	int				sleep_time;
-	int				must_eat_nbr;
-	pthread_mutex_t	*fork_mutex;
-	pthread_mutex_t	*print_mutex;
-	t_philo			*philo;
-}	t_main;
+	unsigned long		die;
+	unsigned long		eat;
+	unsigned long		sleep;
+	long long			musteat;
+	unsigned long		basetime;
+	pthread_mutex_t		*mutex;
+	unsigned long		philo_num;
+	unsigned long		loaded;
+	char				death;
+}				t_main;
 
-//validation.c
-long long int	ft_atoi(const char *str);
-void			_timer(unsigned long time);
-int				ft_is_digit_s(char *str);
-int				ft_valid_args(int argc, char **argv);
-long long		cur_time(void);
-
-//check.c
-void			ft_print_message(t_philo *philo, char *str);
-int				death_check(t_philo *philo);
-int				thread_cycle_limit(t_main *rules);
-void			ft_monitoring(t_main *rules);
+typedef struct s_philos
+{
+	t_main			*rules;
+	t_philostates	state;
+	pthread_mutex_t	*left_fork;
+	pthread_mutex_t	*right_fork;
+	unsigned long	actiontime;
+	unsigned long	deathtime;
+	long long		eatcount;
+	unsigned long	num;
+}				t_philos;
 
 //life.c
-int				create_philo(t_main *rules);
-void			*routine(void *arg);
+void			ft_wait(t_philos	*philos);
+char			free_data(t_philos *ptr);
+char			init_philos(unsigned long c, t_philos *philos, t_main *rules);
 
-//init.c
-int				init_philo(t_main *rules);
-int				init_mutexes(t_main *rules);
-int				get_args( int argc, char **argv, t_main *rules);
+//check.c
+t_main			*get_args(int argc, char *argv[]);
+char			check_inputs(int argc, char *argv[]);
+t_philos		*create_philos(t_philos *ret, unsigned long count, \
+				t_main *rules);
+
+//utils.c
+unsigned long	ft_strlen(const char *str);
+char			check_death(t_philos *philo);
+unsigned long	_timer(void);
+unsigned long	ft_atol(char *str);
+char			ft_free(void *ptr);
+
+//helper2.c
+void			eat(t_philos *philo);
+void			sleeping(t_philos *philo);
+void			thinking(t_philos *philo);
+void			put_msg(t_philos *philo);
+unsigned long	ft_time(t_philos *philo, t_philostates state);
 #endif
