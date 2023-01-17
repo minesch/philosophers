@@ -74,7 +74,7 @@ unsigned long	_timer(void);
 unsigned long	ft_atol(char *str);
 char			ft_free(void *ptr);
 
-//helper2.c
+//helper.c
 void			eat(t_philos *philo);
 void			sleeping(t_philos *philo);
 void			thinking(t_philos *philo);
